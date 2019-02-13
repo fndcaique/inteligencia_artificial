@@ -38,3 +38,4 @@ feliz(X) :- mulher(X), gosta(X,Y), gosta(Y,X).
 
 
 
+%
