@@ -47,3 +47,21 @@ pilota(X,edge540) :- piloto(X), X \= lamb.
 
 % Uma equipe ganha uma corrida quando um dos seus pilotos vence essa corrida
 ganhou(X,Y) :- equipe(X), circuito(Y), piloto(Z), venceu(Z,Y), participa(Z,X).
+
+
+
+% Escreva as seguintes perguntas em Prolog:
+
+% a) Quem venceu a corrida no Porto?
+% venceu(Piloto,porto).
+
+% b) Qual a equipe que ganhou no Porto?
+% ganhou(Equipe,porto).
+
+% c) Quais os pilotos que venceram mais de um circuito?
+
+% d) Que circuitos têm mais de 8 gates?
+% findall((Circuito,QtdeGates), (gates(Circuito,QtdeGates), QtdeGates > 8),Lista).
+
+% e) Que pilotos não pilotam um Edge540? 
+% findall((Piloto,Aviao), (pilota(Piloto,Aviao), Aviao \= edge540), Lista).
