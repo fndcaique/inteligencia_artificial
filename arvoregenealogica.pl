@@ -5,6 +5,7 @@ homem(marcos).
 homem(luis).
 homem(samuel).
 homem(flavio).
+homem(caio).
 
 mulher(ana).
 mulher(maria).
@@ -22,6 +23,7 @@ progenitor(luisa,sueli).
 progenitor(marcos,samuel).
 progenitor(marcos,sueli).
 progenitor(luis,flavio).
+progenitor(marcos, caio).
 
 %REGRAS
 
@@ -50,6 +52,12 @@ irmã(X,Y) :- irmao_(X,Y), mulher(X).
 primo(X,Y) :- primo_(X,Y), homem(X).
 prima(X,Y) :- primo_(X,Y), mulher(X).
 
+
+%countXinList(X,[],0).
+%countXinList(X,[X|T],C) :- !,countXinList(X,T,C1), C is C1+1.
+%countXinList(X,[Y|T],C) :- countXinList(X,T,C).
+
+conta_irmaos(X,N) :- setof([X,Y], (irmao_(X,Y)), L),length(L,N).
 
 
 % findall(filtro, condicao, varresult)

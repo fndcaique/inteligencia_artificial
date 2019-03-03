@@ -3,6 +3,8 @@
 canario(tico).
 
 peixe(nemo).
+% salmão é um tipo de peixe
+peixe(X) :- salmao(X); tubarao(X).
 
 tubarao(tutu).
 
@@ -19,36 +21,41 @@ salmao(alfred).
 
 
 
-
-
 % Regras
-
+delicia(X) :- salmao(X).
 %todos os animais tem pele
-pele(X) :- animal(X).
+tem_pele(X) :- animal(X).
 
 
 % peixes, passaros e mamiferos são animais
-animal(X) :- peixe(X); passaro(X); mamifero(X).
+animal(X) :- peixe(X); ave(X); mamifero(X).
 
-% peixes tem nadadeiras e podem nadar
-peixe(X) :- tem_nadadeira(X), nada(X).
+% peixes tem nadadeiras e podem nadar +
 
-passaro(X) :- tem_asa(X), voa(X).
+tem_nadadeira(X) :- peixe(X).
+
+pode_nadar(X) :- tem_nadadeira(X).
+
+pode_voar(X) :- tem_asa(X), not(avestruz(X)).
+
+tem_asa(X) :- ave(X) ; morcego(X).
 
 % peixes e passaros poem ovos, mamiferos não
 % tubarões são peixes mas não põem ovos
-poem_ovo(X) :- (peixe(X), not(tubarao(X)) ; passaro(X).
-
-% salmão é um tipo de peixe
+poem_ovo(X) :- (peixe(X), not(tubarao(X))) ; ave(X).
 
 
-mamifero(X) :- not(poem_ovo(X)), (anda(X); morcego(X)).
+cor(X, amarelo) :- canario(X).
 
-cor(X,amarelo) :- canario(X).
-
-voa(X) :- passaro(X), not(avestruz(X) ; morcego(X).
 
 da_leite(X) :- vaca(X).
+
+comida(X):- vaca(X).
+
+ave(X) :- canario(X); avestruz(X); tem_asa(X), poem_ovo(X).
+
+mamifero(X) :- vaca(X); morcego(X); not(poem_ovo(X)), anda(X).
+
 
 
 

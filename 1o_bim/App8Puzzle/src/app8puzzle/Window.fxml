@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane minHeight="388.0" minWidth="500.0" onKeyPressed="#onKeyPressedTxDigitar" prefHeight="595.0" prefWidth="595.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app8puzzle.WindowController">
+    <center>
+        <GridPane fx:id="gridPane" alignment="CENTER" gridLinesVisible="true" minHeight="300.0" minWidth="150.0" BorderPane.alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Button focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="1" textFill="WHITE">
+                    <font>
+                        <Font size="50.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="2" textFill="WHITE" GridPane.columnIndex="1">
+                    <font>
+                        <Font size="50.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="3" textFill="WHITE" GridPane.columnIndex="2">
+                    <font>
+                        <Font size="50.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="4" textFill="WHITE" GridPane.rowIndex="1">
+                    <font>
+                        <Font size="50.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="5" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <font>
+                        <Font size="50.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="6" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <font>
+                        <Font size="50.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="441.0" layoutY="164.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="7" textFill="WHITE" GridPane.rowIndex="2">
+                    <font>
+                        <Font size="50.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="8" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <font>
+                        <Font size="50.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: black;" text="  " textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                    <font>
+                        <Font size="50.0" />
+                    </font>
+                </Button>
+            </children>
+        </GridPane>
+    </center>
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+   <top>
+      <GridPane hgap="10.0" BorderPane.alignment="CENTER">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="479.0" minWidth="10.0" prefWidth="287.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="288.0" minWidth="10.0" prefWidth="288.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Button fx:id="btrestore" focusTraversable="false" maxWidth="-Infinity" mnemonicParsing="false" onAction="#clkRestore" prefWidth="500.0" text="Restaurar" GridPane.rowIndex="2" />
+            <Label fx:id="lbmessage" focusTraversable="false" GridPane.columnIndex="1" />
+            <TextField fx:id="txdigitar" editable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#onKeyPressedTxDigitar" prefHeight="0.0" prefWidth="0.0" />
+                <Button fx:id="bt8puzzle" focusTraversable="false" maxWidth="-Infinity" mnemonicParsing="false" onAction="#clk8Puzzle" prefWidth="500.0" text="Embaralhar" />
+            <ComboBox fx:id="cbalgoritmos" focusTraversable="false" prefWidth="500.0" promptText="Selecione 1 Algoritmo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="10.0" />
+         </BorderPane.margin>
+      </GridPane>
+   </top>
+   <bottom>
+      <Label fx:id="txInstrucoes" alignment="TOP_LEFT" focusTraversable="false" prefHeight="45.0" prefWidth="593.0" text="texto de instruções está sendo inserido via código fonte..." BorderPane.alignment="CENTER">
+         <font>
+            <Font size="16.0" />
+         </font>
+         <BorderPane.margin>
+            <Insets top="10.0" />
+         </BorderPane.margin>
+      </Label>
+   </bottom>
+</BorderPane>

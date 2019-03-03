@@ -60,6 +60,10 @@ ganhou(X,Y) :- equipe(X), circuito(Y), piloto(Z), venceu(Z,Y), participa(Z,X).
 
 % c) Quais os pilotos que venceram mais de um circuito?
 
+countXinList(_,[],0).
+countXinList(X,[X|T],C) :- !,countXinList(X,T,C1), C is C1+1.
+countXinList(X,[_|T],C) :- countXinList(X,T,C).
+
 % d) Que circuitos têm mais de 8 gates?
 % findall((Circuito,QtdeGates), (gates(Circuito,QtdeGates), QtdeGates > 8),Lista).
 
