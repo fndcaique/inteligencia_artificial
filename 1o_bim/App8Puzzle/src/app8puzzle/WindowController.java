@@ -6,6 +6,7 @@
 package app8puzzle;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -16,11 +17,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.util.Pair;
 
 /**
  *
@@ -28,12 +29,14 @@ import javafx.scene.layout.GridPane;
  */
 public class WindowController implements Initializable {
 
-    private String styleN, styleK;
+    private ArrayList<Pair<Integer, Integer>> passos;
+    private Tabuleiro tabuleiro;
+    private String styleN, styleK, tempo, movimentos, iteracoes;
     private Button[][] matrix;
-    private int movimentosUser;
+    private int movimentosUser, idxpass;
     private final int TF = 3, LEFT = 0, RIGHT = 1, DOWN = 2, UP = 3;
     private final int[] dy = {0, 0, 1, -1}, dx = {-1, 1, 0, 0};
-    
+
     // vars de controle/necessidades de threads
     private int px, py, idx, qtdeDesordenados, idx2;
     private final int SLEEP_MOVE = 100;
@@ -46,13 +49,26 @@ public class WindowController implements Initializable {
     @FXML
     private Button btrestore;
     @FXML
-    private Label lbmessage;
-    @FXML
     private TextField txdigitar;
     @FXML
     private ComboBox<String> cbalgoritmos;
-    @FXML
     private Label txInstrucoes;
+    @FXML
+    private Button btfindsolution;
+    @FXML
+    private Button btnextpass;
+    @FXML
+    private Button btstopfindsolution;
+    @FXML
+    private Label txiteracoes;
+    @FXML
+    private Label txtempo;
+    @FXML
+    private Label txmovimentos;
+    @FXML
+    private Label txmsg;
+    @FXML
+    private TextField txdigitar1;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -60,29 +76,48 @@ public class WindowController implements Initializable {
         movimentosUser = 0;
         styleN = matrix[0][0].getStyle(); // estilo dos buttons numerados
         styleK = matrix[TF - 1][TF - 1].getStyle(); // estilo do button curinga
-        
-        loadInstrucoes();
+
+        loadAlgoritmos();
+        habilitarComponents("all");
     }
-    
-    private void loadInstrucoes(){
+
+    private void loadAlgoritmos() {
+        cbalgoritmos.getItems().setAll("Selecione 1 Algoritmo",
+                "Força Bruta: DFS",
+                "Força Bruta: BFS",
+                "Eurística: Dist. Manhanttan A*");
+    }
+
+    private void loadInstrucoes() {
         String txt = "Para jogar basta clicar em alguma peça ao lado da peça curinga\n"
                 + "ou  pressionar as teclas direcionais";
         txInstrucoes.setText(txt);
     }
 
     /**
-     * habilita e desabilita componentes que não
-     * podem estar ativos durante o embaralhamento
+     * habilita e desabilita componentes que não podem estar ativos durante o
+     * embaralhamento
      */
-    private void setDisableComponents(boolean v) {
-        btrestore.setDisable(v);
-        txdigitar.setDisable(v);
-        cbalgoritmos.setDisable(v);
+    private void habilitarComponents(String h) {
+        bt8puzzle.setDisable(h.matches("find"));
+        btrestore.setDisable(h.matches("shuffle|find"));
+        txdigitar.setDisable(h.matches("shuffle|find"));
+        cbalgoritmos.setDisable(h.matches("shuffle|find"));
+        btfindsolution.setDisable(h.matches("shuffle|find"));
+        btnextpass.setDisable(!h.matches("solution"));
+        btstopfindsolution.setDisable(!h.matches("find"));
+
+        txiteracoes.setText("Iterações: ");
+        txmovimentos.setText("Movimentos: ");
+        txtempo.setText("Tempo: ");
+        if (!h.matches("solution|nsolution")) {
+            txmsg.setText("Mensagem...");
+        }
     }
 
     /**
-     * pega os buttons do gridpane na ordem em que estão no fxml
-     * e inicializa a matrix com eles
+     * pega os buttons do gridpane na ordem em que estão no fxml e inicializa a
+     * matrix com eles
      */
     private void loadMatrix() {
         Object[] arr = gridPane.getChildren().toArray();
@@ -117,14 +152,14 @@ public class WindowController implements Initializable {
         };
     }
 
-    /** 
+    /**
      * verifica se a coordenada passada é valida
      */
     private boolean inGrid(int l, int c) {
         return l >= 0 && l < TF && c >= 0 && c < TF;
     }
 
-    /** 
+    /**
      * move o button clicado pelo usuário se for permitido
      */
     private void mover(int lin, int col) {
@@ -144,17 +179,14 @@ public class WindowController implements Initializable {
 
     private void isWinner() {
         if (isOrdered()) {
-            Alert a = new Alert(Alert.AlertType.INFORMATION);
-            a.setHeaderText("8puzzle");
-            a.setContentText("Parabéns!!!\nDesafio concluido com " + movimentosUser + " movimentos");
-            a.showAndWait();
+            exibeInformacao("Parabéns!!!\nDesafio concluido com " + movimentosUser + " movimentos");
             movimentosUser = 0;
         }
     }
 
     /**
-     * move o button Curinga somando os valores sy e sx
-     * nas sua coordenadas py e px
+     * move o button Curinga somando os valores sy e sx nas sua coordenadas py e
+     * px
      */
     private void moveSum(int sy, int sx) {
         swapButtons(matrix[py][px], matrix[py + sy][px + sx]);
@@ -163,7 +195,7 @@ public class WindowController implements Initializable {
     }
 
     /**
-     troca o text e o stily dos buttons
+     * troca o text e o stily dos buttons
      */
     private void swapButtons(Button a, Button b) {
         String stla = a.getStyle();
@@ -180,22 +212,20 @@ public class WindowController implements Initializable {
         if (bt8puzzle.getText().equalsIgnoreCase("embaralhar")) {
             movimentosUser = 0;
             shuffle = true;
-            setDisableComponents(true);
+            habilitarComponents("shuffle");
             new Thread(() -> {
                 Platform.runLater(() -> {
                     bt8puzzle.setText("Parar embaralhamento");
-                    lbmessage.setText("Embaralhando...");
                 });
                 shuffle(10, 100, 8, 0.5);
                 Platform.runLater(() -> {
                     bt8puzzle.setText("Embaralhar");
-                    lbmessage.setText("");
-                    setDisableComponents(false);
+                    habilitarComponents("all");
                 });
             }).start();
         } else {
             shuffle = false;
-            setDisableComponents(false);
+            habilitarComponents("all");
         }
     }
 
@@ -206,8 +236,7 @@ public class WindowController implements Initializable {
         int qtd = 0;
         for (int i = 0, k = 1; i < TF; ++i) {
             for (int j = 0; j < TF; ++j, ++k) {
-                if (!matrix[i][j].getText().trim().isEmpty()
-                        && k != Integer.parseInt(matrix[i][j].getText())) {
+                if (k != Integer.parseInt(matrix[i][j].getText())) {
                     ++qtd;
                 }
             }
@@ -220,15 +249,14 @@ public class WindowController implements Initializable {
         int x = 1;
         for (int i = 0; f && i < TF; i++) {
             for (int j = 0; f && j < TF; j++) {
-                if (!matrix[i][j].getText().trim().isEmpty()
-                        && Integer.parseInt(matrix[i][j].getText()) == x) {
+                if (Integer.parseInt(matrix[i][j].getText()) == x) {
                     ++x;
                 } else {
                     f = false;
                 }
             }
         }
-        return x == 9;
+        return f;
     }
 
     /**
@@ -239,7 +267,6 @@ public class WindowController implements Initializable {
         do {
             shuffling();
             qtdeDesordenados = desordenados();
-            System.out.println("desordenadas = " + qtdeDesordenados);
         } while (shuffle && moves < maxmove
                 && (++moves < minmove || qtdeDesordenados < mindesord
                 || Math.random() <= probcontinuar));
@@ -300,7 +327,7 @@ public class WindowController implements Initializable {
 
     /**
      * movimenta o button curinga através do teclado
-     * 
+     *
      */
     private void moveKeyPress(KeyCode code) {
         if (null != code) {
@@ -326,6 +353,7 @@ public class WindowController implements Initializable {
                 if (idx2 > -1 && inGrid(dy[idx2] + py, dx[idx2] + px)) {
                     ++movimentosUser;
                     Platform.runLater(() -> {
+                        habilitarComponents("all");
                         moveSum(dy[idx2], dx[idx2]);
                         isWinner();
                     });
@@ -334,16 +362,30 @@ public class WindowController implements Initializable {
             }).start();
         }
     }
-    
+
     /**
-     * é necessário que o txdigitar esteja habilitado
-     * para que o evento ocorra
+     * é necessário que o txdigitar esteja habilitado para que o evento ocorra
      */
     @FXML
     private void onKeyPressedTxDigitar(KeyEvent event) {
-        moveKeyPress(event.getCode());
+        if (event.getCode() == KeyCode.C && event.isShiftDown() && event.isControlDown()) {
+            sortearNovoCuringa();
+        } else {
+            moveKeyPress(event.getCode());
+        }
     }
 
+    private void sortearNovoCuringa() {
+        int x, y;
+        do {
+            x = ((int) (Math.random() * 10)) % 3;
+            y = ((int) (Math.random() * 10)) % 3;
+        } while (x == px && y == py);
+        matrix[x][y].setStyle(styleK);
+        matrix[px][py].setStyle(styleN);
+        px = x;
+        py = y;
+    }
 
     /**
      * restaura tabuleiro
@@ -356,10 +398,114 @@ public class WindowController implements Initializable {
                 matrix[i][j].setStyle(styleN);
             }
         }
-        matrix[TF - 1][TF - 1].setText("  ");
         matrix[TF - 1][TF - 1].setStyle(styleK);
         px = py = 2;
     }
 
+    private void exibeInformacao(String msg) {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setHeaderText("8puzzle");
+        a.setContentText(msg);
+        a.showAndWait();
+    }
+
+    @FXML
+    private void clkFindSolution(ActionEvent event) {
+        //btstopfindsolution.setDisable(false);
+
+        String select = cbalgoritmos.getSelectionModel().getSelectedItem();
+        if (select == null || select.contains("Selecione")) {// nenhum algorimo selecionado
+            exibeInformacao("Selecione o algorimo de sua preferência");
+        } else {
+            new Thread(() -> {
+                Platform.runLater(() -> {
+                    habilitarComponents("find");
+                });
+                Platform.runLater(() -> txmsg.setText("Buscando Solução..."));
+
+                tabuleiro = new Tabuleiro(3);
+                for (int i = 0; i < matrix.length; i++) {
+                    for (int j = 0; j < matrix[0].length; j++) {
+                        tabuleiro.setValue(i, j, Integer.parseInt(matrix[i][j].getText()));
+                    }
+                }
+                //Alert a = new Alert(Alert.AlertType.INFORMATION);
+                long ini = 0, fim = 0;
+                if (select.contains("DFS")) {
+                    ini = System.currentTimeMillis();
+                    passos = tabuleiro.solveDFS(py, px);
+                    fim = System.currentTimeMillis();
+
+                } else if (select.contains("BFS")) {
+                    ini = System.currentTimeMillis();
+                    passos = tabuleiro.solveBFS(py, px);
+                    fim = System.currentTimeMillis();
+
+                } else if (select.contains("A*")) {
+                    ini = System.currentTimeMillis();
+                    passos = tabuleiro.solveA(py, px);
+                    fim = System.currentTimeMillis();
+
+                }
+                tempo = "";
+                movimentos = "";
+                iteracoes = "";
+
+                if (passos != null) {
+                    movimentos = (passos.size() - 1) + "";
+                    Platform.runLater(() -> {
+                        txmsg.setText("Solução ENCONTRADA!!!");
+                        habilitarComponents("solution");
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        txmsg.setText("Solução NÃO encontrada!!!");
+                        habilitarComponents("nsolution");
+                    });
+                    movimentos = "0";
+                }
+                tempo = (fim - ini) + "";
+                iteracoes = tabuleiro.getIteracoes() + "";
+                //a.setContentText(msg);
+                movimentosUser = idxpass = 0;
+                //btnextpass.setDisable(false);
+                Platform.runLater(() -> {
+                    txiteracoes.setText("Iterações: " + iteracoes);
+                    txmovimentos.setText("Movimentos: " + movimentos);
+                    txtempo.setText("Tempo: " + tempo + " milissegundos");
+                });
+            }).start();
+        }
+    }
+
+    @FXML
+    private void clkNextPass(ActionEvent event) {
+        ++movimentosUser;
+        if (idxpass + 1 < passos.size()) {
+            swapButtons(matrix[passos.get(idxpass).getKey()][passos.get(idxpass).getValue()],
+                    matrix[py = passos.get(idxpass + 1).getKey()][px = passos.get(idxpass + 1).getValue()]);
+            ++idxpass;
+            if (idxpass + 1 == passos.size()) {
+                isWinner();
+            }
+        }
+    }
+
+    @FXML
+    private void selectAlgoritmo(ActionEvent event) {
+        txdigitar.requestFocus();
+    }
+
+    @FXML
+    private void clkStopFindSolution(ActionEvent event) {
+        tabuleiro.stopSolve();
+    }
+
+    @FXML
+    private void onKeyReleasedTxDigitar(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER && !btnextpass.isDisable()) {
+            clkNextPass(null);
+        }
+    }
 
 }
