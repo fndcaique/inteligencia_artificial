@@ -85,7 +85,10 @@ public class WindowController implements Initializable {
         cbalgoritmos.getItems().setAll("Selecione 1 Algoritmo",
                 "Força Bruta: DFS",
                 "Força Bruta: BFS",
-                "Eurística: Dist. Manhanttan A*");
+                "Eurística: Qtde Fora - Best First",
+                "Eurística: Qtde Fora - A*",
+                "Eurística: Dist. Manhanttan - Best First",
+                "Eurística: Dist. Manhanttan - A*");
     }
 
     private void loadInstrucoes() {
@@ -103,7 +106,8 @@ public class WindowController implements Initializable {
         btrestore.setDisable(h.matches("shuffle|find"));
         txdigitar.setDisable(h.matches("shuffle|find"));
         cbalgoritmos.setDisable(h.matches("shuffle|find"));
-        btfindsolution.setDisable(h.matches("shuffle|find"));
+        btfindsolution.setDisable(h.matches("shuffle|find")
+                || cbalgoritmos.getSelectionModel().getSelectedIndex() <= 0);
         btnextpass.setDisable(!h.matches("solution"));
         btstopfindsolution.setDisable(!h.matches("find"));
 
@@ -414,9 +418,7 @@ public class WindowController implements Initializable {
         //btstopfindsolution.setDisable(false);
 
         String select = cbalgoritmos.getSelectionModel().getSelectedItem();
-        if (select == null || select.contains("Selecione")) {// nenhum algorimo selecionado
-            exibeInformacao("Selecione o algorimo de sua preferência");
-        } else {
+        {
             new Thread(() -> {
                 Platform.runLater(() -> {
                     habilitarComponents("find");
@@ -443,9 +445,13 @@ public class WindowController implements Initializable {
 
                 } else if (select.contains("A*")) {
                     ini = System.currentTimeMillis();
-                    passos = tabuleiro.solveA(py, px);
+                    passos = tabuleiro.solveA_DistManhattan(py, px);
                     fim = System.currentTimeMillis();
 
+                }else if(select.contains("Best")){
+                    ini = System.currentTimeMillis();
+                    passos = tabuleiro.solveBestFirst_QtdeFora(py, px);
+                    fim = System.currentTimeMillis();
                 }
                 tempo = "";
                 movimentos = "";
@@ -493,6 +499,7 @@ public class WindowController implements Initializable {
 
     @FXML
     private void selectAlgoritmo(ActionEvent event) {
+        btfindsolution.setDisable(cbalgoritmos.getSelectionModel().getSelectedIndex() <= 0);
         txdigitar.requestFocus();
     }
 

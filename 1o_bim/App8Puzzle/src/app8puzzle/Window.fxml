@@ -33,7 +33,7 @@
             <TextField fx:id="txdigitar" editable="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#onKeyPressedTxDigitar" onKeyReleased="#onKeyReleasedTxDigitar" prefHeight="0.0" prefWidth="0.0" />
                 <Button fx:id="bt8puzzle" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clk8Puzzle" prefWidth="5000.0" text="Embaralhar" />
             <ComboBox fx:id="cbalgoritmos" focusTraversable="false" maxWidth="1.7976931348623157E308" onAction="#selectAlgoritmo" prefWidth="5000.0" promptText="Selecione 1 Algoritmo" GridPane.columnIndex="1" />
-            <Button fx:id="btfindsolution" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clkFindSolution" prefWidth="5000.0" text="Buscar solução" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Button fx:id="btfindsolution" disable="true" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clkFindSolution" prefWidth="5000.0" text="Buscar solução" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Button fx:id="btnextpass" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clkNextPass" prefWidth="5000.0" text="Proximo passo" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Button fx:id="btstopfindsolution" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clkStopFindSolution" prefWidth="5000.0" text="Para busca pela solução" GridPane.rowIndex="2" />
             <Label fx:id="txiteracoes" text="Iterações: " GridPane.rowIndex="3" />
