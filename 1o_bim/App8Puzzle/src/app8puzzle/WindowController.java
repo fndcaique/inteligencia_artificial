@@ -437,18 +437,26 @@ public class WindowController implements Initializable {
                     ini = System.currentTimeMillis();
                     passos = tabuleiro.solveDFS(py, px);
                     fim = System.currentTimeMillis();
-
                 } else if (select.contains("BFS")) {
                     ini = System.currentTimeMillis();
                     passos = tabuleiro.solveBFS(py, px);
                     fim = System.currentTimeMillis();
 
-                } else if (select.contains("A*")) {
+                } else if (select.contains("Dist. Manhanttan - A*")) {
                     ini = System.currentTimeMillis();
                     passos = tabuleiro.solveA_DistManhattan(py, px);
                     fim = System.currentTimeMillis();
 
-                }else if(select.contains("Best")){
+                } else if (select.contains("Dist. Manhanttan - Best First")) {
+                    ini = System.currentTimeMillis();
+                    passos = tabuleiro.solveBestFirst_DistManhattan(py, px);
+                    fim = System.currentTimeMillis();
+                } else if (select.contains("Qtde Fora - A*")) {
+                    ini = System.currentTimeMillis();
+                    passos = tabuleiro.solveA_QtdeFora(py, px);
+                    fim = System.currentTimeMillis();
+
+                } else if (select.contains("Qtde Fora - Best First")) {
                     ini = System.currentTimeMillis();
                     passos = tabuleiro.solveBestFirst_QtdeFora(py, px);
                     fim = System.currentTimeMillis();
