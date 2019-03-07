@@ -79,16 +79,7 @@ public class WindowController implements Initializable {
 
         loadAlgoritmos();
         habilitarComponents("all");
-    }
-
-    private void loadAlgoritmos() {
-        cbalgoritmos.getItems().setAll("Selecione 1 Algoritmo",
-                "Força Bruta: DFS",
-                "Força Bruta: BFS",
-                "Eurística: Qtde Fora - Best First",
-                "Eurística: Qtde Fora - A*",
-                "Eurística: Dist. Manhanttan - Best First",
-                "Eurística: Dist. Manhanttan - A*");
+        inicializaTabuleiro();
     }
 
     private void loadInstrucoes() {
@@ -133,7 +124,6 @@ public class WindowController implements Initializable {
             }
         }
         py = px = 2;
-
     }
 
     private void exibeMatrix() {
@@ -372,23 +362,19 @@ public class WindowController implements Initializable {
      */
     @FXML
     private void onKeyPressedTxDigitar(KeyEvent event) {
-        if (event.getCode() == KeyCode.C && event.isShiftDown() && event.isControlDown()) {
-            sortearNovoCuringa();
-        } else {
-            moveKeyPress(event.getCode());
-        }
+        moveKeyPress(event.getCode());
     }
 
-    private void sortearNovoCuringa() {
-        int x, y;
-        do {
-            x = ((int) (Math.random() * 10)) % 3;
-            y = ((int) (Math.random() * 10)) % 3;
-        } while (x == px && y == py);
-        matrix[x][y].setStyle(styleK);
-        matrix[px][py].setStyle(styleN);
-        px = x;
-        py = y;
+    private void inicializaTabuleiro() {
+        for (int i = 0, k = 1; i < matrix.length; i++) {
+            for (int j = 0; j < matrix.length; j++) {
+                matrix[i][j].setText("" + (k++));
+                matrix[i][j].setStyle(styleN);
+            }
+        }
+        px = ((int)(Math.random()*10))%3;
+        py = ((int)(Math.random()*10))%3;
+        matrix[py][px].setStyle(styleK);
     }
 
     /**
@@ -396,14 +382,7 @@ public class WindowController implements Initializable {
      */
     @FXML
     private void clkRestore(ActionEvent event) {
-        for (int i = 0, k = 1; i < matrix.length; i++) {
-            for (int j = 0; j < matrix.length; j++) {
-                matrix[i][j].setText("" + (k++));
-                matrix[i][j].setStyle(styleN);
-            }
-        }
-        matrix[TF - 1][TF - 1].setStyle(styleK);
-        px = py = 2;
+        inicializaTabuleiro();
     }
 
     private void exibeInformacao(String msg) {
@@ -413,91 +392,102 @@ public class WindowController implements Initializable {
         a.showAndWait();
     }
 
+    private void loadAlgoritmos() {
+        cbalgoritmos.getItems().setAll("Selecione 1 Algoritmo",
+                "Força Bruta: DFS",
+                "Força Bruta: BFS",
+                "Heurística: Best First - Qtde Fora",
+                "Heurística: Best First - Dist. Manhattan",
+                "Heurística: A* - Qtde Fora",
+                "Heurística: A* - Dist. Manhattan");
+    }
+
     @FXML
     private void clkFindSolution(ActionEvent event) {
-        //btstopfindsolution.setDisable(false);
 
         String select = cbalgoritmos.getSelectionModel().getSelectedItem();
-        {
-            new Thread(() -> {
+
+        new Thread(() -> {
+            Platform.runLater(() -> {
+                habilitarComponents("find");
+            });
+            Platform.runLater(() -> txmsg.setText("Buscando Solução..."));
+
+            int[][] begin = new int[3][3], end = new int[3][3];
+            for (int i = 0, k = 1; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[0].length; j++) {
+                    begin[i][j] = Integer.parseInt(matrix[i][j].getText());
+                    end[i][j] = k++;
+                }
+            }
+            tabuleiro = new Tabuleiro(begin, end);
+            //Alert a = new Alert(Alert.AlertType.INFORMATION);
+            long ini = 0, fim = 0;
+            if (select.contains("DFS")) {
+                ini = System.currentTimeMillis();
+                passos = tabuleiro.solveDFS(px, py);
+                fim = System.currentTimeMillis();
+            } else if (select.contains("BFS")) {
+                ini = System.currentTimeMillis();
+                passos = tabuleiro.solveBFS(px, py);
+                fim = System.currentTimeMillis();
+
+            } else if (select.contains("A* - Dist. Manhattan")) {
+                ini = System.currentTimeMillis();
+                passos = tabuleiro.solveA_DistManhattan(px, py);
+                fim = System.currentTimeMillis();
+
+            } else if (select.contains("Best First - Dist. Manhattan")) {
+                ini = System.currentTimeMillis();
+                passos = tabuleiro.solveBestFirst_DistManhattan(px, py);
+                fim = System.currentTimeMillis();
+            } else if (select.contains("A* - Qtde Fora")) {
+                ini = System.currentTimeMillis();
+                passos = tabuleiro.solveA_QtdeFora(px, py);
+                fim = System.currentTimeMillis();
+
+            } else if (select.contains("Best First - Qtde Fora")) {
+                ini = System.currentTimeMillis();
+                passos = tabuleiro.solveBestFirst_QtdeFora(px, py);
+                fim = System.currentTimeMillis();
+            }
+            tempo = "";
+            movimentos = "";
+            iteracoes = "";
+
+            if (passos != null) {
+                movimentos = (passos.size() - 1) + "";
                 Platform.runLater(() -> {
-                    habilitarComponents("find");
+                    txmsg.setText("Solução ENCONTRADA!!!");
+                    habilitarComponents("solution");
                 });
-                Platform.runLater(() -> txmsg.setText("Buscando Solução..."));
-
-                tabuleiro = new Tabuleiro(3);
-                for (int i = 0; i < matrix.length; i++) {
-                    for (int j = 0; j < matrix[0].length; j++) {
-                        tabuleiro.setValue(i, j, Integer.parseInt(matrix[i][j].getText()));
-                    }
-                }
-                //Alert a = new Alert(Alert.AlertType.INFORMATION);
-                long ini = 0, fim = 0;
-                if (select.contains("DFS")) {
-                    ini = System.currentTimeMillis();
-                    passos = tabuleiro.solveDFS(py, px);
-                    fim = System.currentTimeMillis();
-                } else if (select.contains("BFS")) {
-                    ini = System.currentTimeMillis();
-                    passos = tabuleiro.solveBFS(py, px);
-                    fim = System.currentTimeMillis();
-
-                } else if (select.contains("Dist. Manhanttan - A*")) {
-                    ini = System.currentTimeMillis();
-                    passos = tabuleiro.solveA_DistManhattan(py, px);
-                    fim = System.currentTimeMillis();
-
-                } else if (select.contains("Dist. Manhanttan - Best First")) {
-                    ini = System.currentTimeMillis();
-                    passos = tabuleiro.solveBestFirst_DistManhattan(py, px);
-                    fim = System.currentTimeMillis();
-                } else if (select.contains("Qtde Fora - A*")) {
-                    ini = System.currentTimeMillis();
-                    passos = tabuleiro.solveA_QtdeFora(py, px);
-                    fim = System.currentTimeMillis();
-
-                } else if (select.contains("Qtde Fora - Best First")) {
-                    ini = System.currentTimeMillis();
-                    passos = tabuleiro.solveBestFirst_QtdeFora(py, px);
-                    fim = System.currentTimeMillis();
-                }
-                tempo = "";
-                movimentos = "";
-                iteracoes = "";
-
-                if (passos != null) {
-                    movimentos = (passos.size() - 1) + "";
-                    Platform.runLater(() -> {
-                        txmsg.setText("Solução ENCONTRADA!!!");
-                        habilitarComponents("solution");
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                        txmsg.setText("Solução NÃO encontrada!!!");
-                        habilitarComponents("nsolution");
-                    });
-                    movimentos = "0";
-                }
-                tempo = (fim - ini) + "";
-                iteracoes = tabuleiro.getIteracoes() + "";
-                //a.setContentText(msg);
-                movimentosUser = idxpass = 0;
-                //btnextpass.setDisable(false);
+            } else {
                 Platform.runLater(() -> {
-                    txiteracoes.setText("Iterações: " + iteracoes);
-                    txmovimentos.setText("Movimentos: " + movimentos);
-                    txtempo.setText("Tempo: " + tempo + " milissegundos");
+                    txmsg.setText("Solução NÃO encontrada!!!");
+                    habilitarComponents("nsolution");
                 });
-            }).start();
-        }
+                movimentos = "0";
+            }
+            tempo = (fim - ini) + "";
+            iteracoes = tabuleiro.getIteracoes() + "";
+            //a.setContentText(msg);
+            movimentosUser = idxpass = 0;
+            //btnextpass.setDisable(false);
+            Platform.runLater(() -> {
+                txiteracoes.setText("Iterações: " + iteracoes);
+                txmovimentos.setText("Movimentos: " + movimentos);
+                txtempo.setText("Tempo: " + tempo + " milissegundos");
+            });
+        }).start();
+
     }
 
     @FXML
     private void clkNextPass(ActionEvent event) {
         ++movimentosUser;
         if (idxpass + 1 < passos.size()) {
-            swapButtons(matrix[passos.get(idxpass).getKey()][passos.get(idxpass).getValue()],
-                    matrix[py = passos.get(idxpass + 1).getKey()][px = passos.get(idxpass + 1).getValue()]);
+            swapButtons(matrix[passos.get(idxpass).getValue()][passos.get(idxpass).getKey()],
+                    matrix[py = passos.get(idxpass + 1).getValue()][px = passos.get(idxpass + 1).getKey()]);
             ++idxpass;
             if (idxpass + 1 == passos.size()) {
                 isWinner();

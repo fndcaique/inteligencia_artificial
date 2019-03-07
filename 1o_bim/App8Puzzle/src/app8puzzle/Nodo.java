@@ -18,18 +18,18 @@ public class Nodo implements Comparable<Nodo>
     private int fc, fa;
     private ArrayList<Pair<Integer, Integer>> caminho;
     private int [][] matrix;
-    private int cx, cy;
+    private int x, y;
 
     public Nodo() {
     }
 
-    public Nodo(int fc, int fa, ArrayList<Pair<Integer, Integer>> caminho, int[][] matrix, int cx, int cy) {
+    public Nodo(int[][] matrix, int x, int y, ArrayList<Pair<Integer, Integer>> caminho, int fc, int fa) {
         this.fc = fc;
         this.fa = fa;
         this.caminho = caminho;
         this.matrix = matrix;
-        this.cx = cx;
-        this.cy = cy;
+        this.x = x;
+        this.y = y;
     }
     
     
@@ -50,23 +50,23 @@ public class Nodo implements Comparable<Nodo>
         this.matrix = matrix;
     }
 
-    public int getCx() {
-        return cx;
+    public int getX() {
+        return x;
     }
 
-    public void setCx(int cx) {
-        this.cx = cx;
+    public void setX(int x) {
+        this.x = x;
     }
 
-    public int getCy() {
-        return cy;
+    public int getY() {
+        return y;
     }
 
-    public void setCy(int cy) {
-        this.cy = cy;
+    public void setY(int y) {
+        this.y = y;
     }
-    
-    
+
+      
 
     public int getFc() {
         return fc;
