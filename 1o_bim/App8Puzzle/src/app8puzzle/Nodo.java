@@ -11,16 +11,17 @@ import javafx.util.Pair;
 /**
  *
  * @author fnd
- * @param <T>
  */
-public class Nodo implements Comparable<Nodo>
-{
+public class Nodo implements Comparable<Nodo> {
+
     private int fc, fa;
     private ArrayList<Pair<Integer, Integer>> caminho;
-    private int [][] matrix;
+    private ArrayList<String> visits;
+    private int[][] matrix;
     private int x, y;
 
     public Nodo() {
+
     }
 
     public Nodo(int[][] matrix, int x, int y, ArrayList<Pair<Integer, Integer>> caminho, int fc, int fa) {
@@ -30,9 +31,70 @@ public class Nodo implements Comparable<Nodo>
         this.matrix = matrix;
         this.x = x;
         this.y = y;
+        initialize();
     }
-    
-    
+
+    private void initialize() {
+        visits = new ArrayList<>();
+    }
+
+    public void setVisits(ArrayList<String> visits) {
+        this.visits = visits;
+    }
+
+    public void insertVisit(String est) {
+        int pos = binarySearch(est);
+        if (pos >= visits.size()) {
+            pos -= visits.size();
+            remanejaVisits(pos);
+            visits.set(pos, est);
+        }
+
+    }
+
+    private void remanejaVisits(int pos) {
+        visits.add(null);
+        for (int i = visits.size() - 2; i >= pos; --i) {
+            visits.set(i + 1, visits.get(i));
+        }
+    }
+
+    public boolean isVisit(String est) {
+        return binarySearch(est) < visits.size();
+    }
+
+    public int binarySearch(String est) {
+        if (visits.isEmpty()) {
+            return 0;
+        }
+        int ini = 0, fim = visits.size() - 1;
+        int meio = (ini + fim) >> 1;
+        int comp = est.compareTo(visits.get(meio));
+        while (ini < fim && comp != 0) {
+            if (comp > 0) {
+                ini = meio + 1;
+            } else {
+                fim = meio - 1;
+            }
+            if (ini < fim) {
+                meio = (ini + fim) >> 1;
+                comp = est.compareTo(visits.get(meio));
+            }
+        }
+
+        if (comp == 0) {
+            return meio;
+        }
+        if (est.compareTo(visits.get(meio)) > 0) {
+            return visits.size() + meio + 1;
+        }
+        return visits.size() + meio;
+
+    }
+
+    public ArrayList<String> getVisits() {
+        return visits;
+    }
 
     public ArrayList<Pair<Integer, Integer>> getCaminho() {
         return caminho;
@@ -66,8 +128,6 @@ public class Nodo implements Comparable<Nodo>
         this.y = y;
     }
 
-      
-
     public int getFc() {
         return fc;
     }
@@ -86,7 +146,7 @@ public class Nodo implements Comparable<Nodo>
 
     @Override
     public int compareTo(Nodo o) {
-        return (fc+fa) - (o.getFc() + o.getFa());
+        return (fc + fa) - (o.getFc() + o.getFa());
     }
-    
+
 }

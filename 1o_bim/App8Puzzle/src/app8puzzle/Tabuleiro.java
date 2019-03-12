@@ -5,6 +5,7 @@
  */
 package app8puzzle;
 
+import com.sun.webkit.network.Util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.PriorityQueue;
@@ -19,6 +20,7 @@ public class Tabuleiro {
 
     private boolean continuar;
     private int[][] begin, end;
+    private String estFinal;
     private int iteracoes;
     private HashMap<Integer, Pair<Integer, Integer>> manhattan;
     private ArrayList<Pair<Integer, Integer>> caminho;
@@ -37,11 +39,23 @@ public class Tabuleiro {
                 manhattan.put(end[i][j], new Pair<>(j, i));
             }
         }
+
+        estFinal = Utils.arrayToString(end);
     }
 
     private int distManhattan(int x, int y, int value) {
         Pair<Integer, Integer> coord = manhattan.get(value); // 0 a 8
         return Math.abs(x - coord.getKey()) + Math.abs(y - coord.getValue());
+    }
+
+    private Pair<Integer, Integer> getCoord(int posSeq) {
+        int x = posSeq % 3;
+        int y = posSeq / 3;
+        return new Pair<>(x, y);
+    }
+
+    private int getPosSequencial(int x, int y) {
+        return 3 * y + x;
     }
 
     /**
@@ -78,6 +92,48 @@ public class Tabuleiro {
         }
     }
 
+    public boolean visitado(ArrayList<int[][]> list, int[][] mat) {
+        for (int[][] is : list) {
+            if (Utils.compareMatrix(is, mat) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * se achou retorna a posição na list de visits; se não achou retorna
+     * visits.size() + a pos que deveria estar
+     */
+    /*private int binarySearchVisits(String estado) {
+        if (vis.isEmpty()) {
+            return 0;
+        } else {
+            int ini = 0, fim = visits.size() - 1;
+            int med = (ini + fim) >> 1;
+            int dif = estado.compareTo(vis.get(med));
+            while (ini < fim && dif != 0) {
+                if (dif > 0) {
+                    ini = med + 1;
+                } else {
+                    fim = med - 1;
+                }
+                if (ini < fim) {
+                    med = (ini + fim) >> 1;
+                    dif = Utils.compareMatrix(ma, visits.get(med));
+                }
+            }
+            if (dif == 0) {
+                return med;
+            } else {
+                dif = Utils.compareMatrix(ma, visits.get(med));
+                if (dif > 0) {
+                    return visits.size() + (med + 1);
+                }
+                return visits.size() + med;
+            }
+        }
+    }*/
     public int insertBinaryVisits(int ma[][]) {
         int pos = binarySearchVisits(ma);
         if (pos >= visits.size()) { // ainda não inserido
@@ -103,50 +159,46 @@ public class Tabuleiro {
     public ArrayList<Pair<Integer, Integer>> solveDFS(int y, int x) {
         //System.out.println("Iniciando DFS");
         //exibeMatrix(matrix);
-        visits = new ArrayList<>();
-        boolean solved = false;
+        String est;
         int[][] mat;
-        ArrayList<Pair<Integer, Integer>> caminhoatual = new ArrayList<>(), nc;
-        Stack<ArrayList<Pair<Integer, Integer>>> pcaminhos = new Stack<>();
-        Stack<Integer> pcoords = new Stack<>(); // pilha de coods curinga
-        Stack<int[][]> pmatrix = new Stack<>(); // pilha de matrix
-
-        caminhoatual.add(new Pair<>(y, x));
-        pcoords.push(x);
-        pcoords.push(y);
-        pmatrix.push(Utils.copyMatrix(begin));
-        pcaminhos.push(caminhoatual);
+        ArrayList<Pair<Integer, Integer>> caminhoatual = new ArrayList<>(), novocam;
+        caminhoatual.add(new Pair(x, y));
+        Stack<Nodo> pq = new Stack<>();
         iteracoes = 0;
         continuar = true;
+        Nodo no = new Nodo(begin, x, y, caminhoatual, 0, 0), aux;
+        pq.push(no);
         caminho = null;
-        while (continuar && !pmatrix.isEmpty()) {
-            y = pcoords.pop();
-            x = pcoords.pop();
-            mat = pmatrix.pop();
-            caminhoatual = pcaminhos.pop();
-            //exibeMatrix(mat);
+        while (continuar && !pq.isEmpty()) {
             ++iteracoes;
-            insertBinaryVisits(Utils.copyMatrix(mat));
-            if (Utils.compareMatrix(mat, end) == 0) {
-                caminho = caminhoatual;
-                solved = true;
+            no = pq.pop();
+            est = Utils.arrayToString(no.getMatrix());
+            //insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
+            no.insertVisit(est);
+            if (est.compareTo(estFinal) == 0) {
+                caminho = no.getCaminho();
                 break;
             } else {
-                for (int i = DIRECTIONS - 1; i >= 0; --i) {
+                x = no.getX();
+                y = no.getY();
+                mat = no.getMatrix();
+                for (int i = 0; i < DIRECTIONS; ++i) {
                     if (Utils.inMatrix(begin.length, x + dx[i], y + dy[i])) {
                         Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
-
-                        if (binarySearchVisits(mat) >= visits.size()) {
-                            nc = copyArrayList(caminhoatual);
-                            nc.add(new Pair<>(y + dy[i], x + dx[i]));
-
-                            pcoords.push(x + dx[i]);
-                            pcoords.push(y + dy[i]);
-                            pmatrix.push(Utils.copyMatrix(mat));
-                            pcaminhos.push(nc);
+                        // if(binarySearchVisits(mat) >= visits.size()
+                        est = Utils.arrayToString(mat);
+                        if (!no.isVisit(est)) 
+                        {
+                            ArrayList<String> list = Utils.copyArray(no.getVisits());
+                            novocam = copyArrayList(no.getCaminho());
+                            novocam.add(new Pair(x + dx[i], y + dy[i]));
+                            aux = new Nodo(Utils.copyMatrix(mat), x + dx[i], y + dy[i],
+                                    novocam, 0, 0);
+                            aux.setVisits(list);
+                            pq.push(aux);
                         }
-                        Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
 
+                        Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
                     }
                 }
             }
@@ -162,50 +214,46 @@ public class Tabuleiro {
     public ArrayList<Pair<Integer, Integer>> solveBFS(int x, int y) {
         //System.out.println("Iniciando BFS");
         //exibeMatrix(matrix);
-        visits = new ArrayList<>();
-        boolean solved = false;
+        String est;
         int[][] mat;
-        ArrayList<Pair<Integer, Integer>> caminhoatual = new ArrayList<>(), nc;
-        ArrayList<ArrayList<Pair<Integer, Integer>>> filacaminhos = new ArrayList<>();
-        ArrayList<Integer> filacoords = new ArrayList<>(); // pilha de coods curinga
-        ArrayList<int[][]> filamatrix = new ArrayList<>(); // pilha de matrix
-
-        caminhoatual.add(new Pair<>(x, y));
-        filacoords.add(x);
-        filacoords.add(y);
-        filamatrix.add(Utils.copyMatrix(begin));
-        filacaminhos.add(caminhoatual);
+        ArrayList<Pair<Integer, Integer>> caminhoatual = new ArrayList<>(), novocam;
+        caminhoatual.add(new Pair(x, y));
+        ArrayList<Nodo> pq = new ArrayList<>();
         iteracoes = 0;
         continuar = true;
+        Nodo no = new Nodo(begin, x, y, caminhoatual, 0, 0), aux;
+        pq.add(no);
         caminho = null;
-        while (continuar && !filamatrix.isEmpty()) {
-            x = filacoords.remove(0);
-            y = filacoords.remove(0);
-            mat = filamatrix.remove(0);
-            caminhoatual = filacaminhos.remove(0);
-            //exibeMatrix(mat);
-            iteracoes++;
-            insertBinaryVisits(Utils.copyMatrix(mat));
-            if (Utils.compareMatrix(mat, end) == 0) {
-                caminho = caminhoatual;
-                solved = true;
+        while (continuar && !pq.isEmpty()) {
+            ++iteracoes;
+            no = pq.remove(0);
+            est = Utils.arrayToString(no.getMatrix());
+            //insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
+            no.insertVisit(est);
+            if (est.compareTo(estFinal) == 0) {
+                caminho = no.getCaminho();
                 break;
             } else {
+                x = no.getX();
+                y = no.getY();
+                mat = no.getMatrix();
                 for (int i = 0; i < DIRECTIONS; ++i) {
                     if (Utils.inMatrix(begin.length, x + dx[i], y + dy[i])) {
                         Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
-                        if (binarySearchVisits(mat) >= visits.size()) {
-                            nc = copyArrayList(caminhoatual);
-                            nc.add(new Pair<>(x + dx[i], y + dy[i]));
-
-                            filacoords.add(x + dx[i]);
-                            filacoords.add(y + dy[i]);
-                            filamatrix.add(Utils.copyMatrix(mat));
-                            filacaminhos.add(nc);
+                        // if(binarySearchVisits(mat) >= visits.size()
+                        est = Utils.arrayToString(mat);
+                        if (!no.isVisit(est)) 
+                        {
+                            ArrayList<String> list = Utils.copyArray(no.getVisits());
+                            novocam = copyArrayList(no.getCaminho());
+                            novocam.add(new Pair(x + dx[i], y + dy[i]));
+                            aux = new Nodo(Utils.copyMatrix(mat), x + dx[i], y + dy[i],
+                                    novocam, 0, 0);
+                            aux.setVisits(list);
+                            pq.add(aux);
                         }
 
                         Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
-
                     }
                 }
             }
@@ -216,12 +264,10 @@ public class Tabuleiro {
     public ArrayList<Pair<Integer, Integer>> solveBestFirst_QtdeFora(int x, int y) {
         //System.out.println("Iniciando Best First");
         //exibeMatrix(matrix);
-        
-        visits = new ArrayList<>();
-        boolean solved = false;
+        String est;
         int[][] mat;
         ArrayList<Pair<Integer, Integer>> caminhoatual = new ArrayList<>(), novocam;
-        caminhoatual.add(new Pair(y, x));
+        caminhoatual.add(new Pair(x, y));
         PriorityQueue<Nodo> pq = new PriorityQueue<>();
         iteracoes = 0;
         continuar = true;
@@ -231,10 +277,11 @@ public class Tabuleiro {
         while (continuar && !pq.isEmpty()) {
             ++iteracoes;
             no = pq.remove();
-            insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
-            if (Utils.compareMatrix(no.getMatrix(), end) == 0) {
+            est = Utils.arrayToString(no.getMatrix());
+            //insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
+            no.insertVisit(est);
+            if (est.compareTo(estFinal) == 0) {
                 caminho = no.getCaminho();
-                solved = true;
                 break;
             } else {
                 x = no.getX();
@@ -243,12 +290,15 @@ public class Tabuleiro {
                 for (int i = 0; i < DIRECTIONS; ++i) {
                     if (Utils.inMatrix(begin.length, x + dx[i], y + dy[i])) {
                         Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
-
-                        if (binarySearchVisits(mat) >= visits.size()) {
+                        // if(binarySearchVisits(mat) >= visits.size()
+                        est = Utils.arrayToString(mat);
+                        if (!no.isVisit(est)) {
+                            ArrayList<String> list = Utils.copyArray(no.getVisits());
                             novocam = copyArrayList(no.getCaminho());
-                            novocam.add(new Pair( x + dx[i],y + dy[i]));
+                            novocam.add(new Pair(x + dx[i], y + dy[i]));
                             aux = new Nodo(Utils.copyMatrix(mat), x + dx[i], y + dy[i],
                                     novocam, 0, analiseQtdeFora(mat));
+                            aux.setVisits(list);
                             pq.add(aux);
                         }
 
@@ -263,8 +313,7 @@ public class Tabuleiro {
     public ArrayList<Pair<Integer, Integer>> solveBestFirst_DistManhattan(int x, int y) {
         //System.out.println("Iniciando Best First");
         //exibeMatrix(matrix);
-        visits = new ArrayList<>();
-        boolean solved = false;
+        String est;
         int[][] mat;
         ArrayList<Pair<Integer, Integer>> caminhoatual = new ArrayList<>(), novocam;
         caminhoatual.add(new Pair(x, y));
@@ -277,10 +326,11 @@ public class Tabuleiro {
         while (continuar && !pq.isEmpty()) {
             ++iteracoes;
             no = pq.remove();
-            insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
-            if (Utils.compareMatrix(no.getMatrix(), end) == 0) {
+            est = Utils.arrayToString(no.getMatrix());
+            //insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
+            no.insertVisit(est);
+            if (est.compareTo(estFinal) == 0) {
                 caminho = no.getCaminho();
-                solved = true;
                 break;
             } else {
                 x = no.getX();
@@ -289,15 +339,17 @@ public class Tabuleiro {
                 for (int i = 0; i < DIRECTIONS; ++i) {
                     if (Utils.inMatrix(begin.length, x + dx[i], y + dy[i])) {
                         Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
-
-                        if (binarySearchVisits(mat) >= visits.size()) {
+                        // if(binarySearchVisits(mat) >= visits.size()
+                        est = Utils.arrayToString(mat);
+                        if (!no.isVisit(est)) {
+                            ArrayList<String> list = Utils.copyArray(no.getVisits());
                             novocam = copyArrayList(no.getCaminho());
                             novocam.add(new Pair(x + dx[i], y + dy[i]));
                             aux = new Nodo(Utils.copyMatrix(mat), x + dx[i], y + dy[i],
                                     novocam, 0, analiseDistManhattan(mat));
+                            aux.setVisits(list);
                             pq.add(aux);
                         }
-
                         Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
                     }
                 }
@@ -321,8 +373,7 @@ public class Tabuleiro {
     public ArrayList<Pair<Integer, Integer>> solveA_DistManhattan(int x, int y) {
         //System.out.println("Iniciando A*");
         //exibeMatrix(matrix);
-        visits = new ArrayList<>();
-        boolean solved = false;
+        String est;
         int[][] mat;
         ArrayList<Pair<Integer, Integer>> caminhoatual = new ArrayList<>(), novocam;
         caminhoatual.add(new Pair(x, y));
@@ -335,10 +386,11 @@ public class Tabuleiro {
         while (continuar && !pq.isEmpty()) {
             ++iteracoes;
             no = pq.remove();
-            insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
-            if (Utils.compareMatrix(no.getMatrix(), end) == 0) {
+            est = Utils.arrayToString(no.getMatrix());
+            //insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
+            no.insertVisit(est);
+            if (est.compareTo(estFinal) == 0) {
                 caminho = no.getCaminho();
-                solved = true;
                 break;
             } else {
                 x = no.getX();
@@ -347,12 +399,15 @@ public class Tabuleiro {
                 for (int i = 0; i < DIRECTIONS; ++i) {
                     if (Utils.inMatrix(begin.length, x + dx[i], y + dy[i])) {
                         Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
-
-                        if (binarySearchVisits(mat) >= visits.size()) {
+                        // if(binarySearchVisits(mat) >= visits.size()
+                        est = Utils.arrayToString(mat);
+                        if (!no.isVisit(est)) {
+                            ArrayList<String> list = Utils.copyArray(no.getVisits());
                             novocam = copyArrayList(no.getCaminho());
                             novocam.add(new Pair(x + dx[i], y + dy[i]));
                             aux = new Nodo(Utils.copyMatrix(mat), x + dx[i], y + dy[i],
                                     novocam, no.getFc() + 1, analiseDistManhattan(mat));
+                            aux.setVisits(list);
                             pq.add(aux);
                         }
 
@@ -367,7 +422,7 @@ public class Tabuleiro {
     public ArrayList<Pair<Integer, Integer>> solveA_QtdeFora(int x, int y) {
         //System.out.println("Iniciando A*");
         //exibeMatrix(matrix);
-        visits = new ArrayList<>();
+        String est;
         int[][] mat;
         ArrayList<Pair<Integer, Integer>> caminhoatual = new ArrayList<>(), novocam;
         caminhoatual.add(new Pair(x, y));
@@ -380,8 +435,10 @@ public class Tabuleiro {
         while (continuar && !pq.isEmpty()) {
             ++iteracoes;
             no = pq.remove();
-            insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
-            if (Utils.compareMatrix(no.getMatrix(), end) == 0) {
+            est = Utils.arrayToString(no.getMatrix());
+            //insertBinaryVisits(Utils.copyMatrix(no.getMatrix()));
+            no.insertVisit(est);
+            if (est.compareTo(estFinal) == 0) {
                 caminho = no.getCaminho();
                 break;
             } else {
@@ -391,12 +448,15 @@ public class Tabuleiro {
                 for (int i = 0; i < DIRECTIONS; ++i) {
                     if (Utils.inMatrix(begin.length, x + dx[i], y + dy[i])) {
                         Utils.swap(mat, x, y, x + dx[i], y + dy[i]);
-
-                        if (binarySearchVisits(mat) >= visits.size()) {
+                        // if(binarySearchVisits(mat) >= visits.size()
+                        est = Utils.arrayToString(mat);
+                        if (!no.isVisit(est)) {
+                            ArrayList<String> list = Utils.copyArray(no.getVisits());
                             novocam = copyArrayList(no.getCaminho());
-                            novocam.add(new Pair(y + dy[i], x + dx[i]));
+                            novocam.add(new Pair(x + dx[i], y + dy[i]));
                             aux = new Nodo(Utils.copyMatrix(mat), x + dx[i], y + dy[i],
                                     novocam, no.getFc() + 1, analiseQtdeFora(mat));
+                            aux.setVisits(list);
                             pq.add(aux);
                         }
 

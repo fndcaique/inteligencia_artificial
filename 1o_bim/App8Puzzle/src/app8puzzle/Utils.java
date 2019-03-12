@@ -34,6 +34,14 @@ public class Utils {
         });
         return b;
     }
+    
+    public static ArrayList<String> copyArray(ArrayList<String> l){
+        ArrayList<String> lis = new ArrayList<>();
+        for (String li : lis) {
+            l.add(li);
+        }
+        return l;
+    }
 
     public static void swap(int[][] m, int x1, int y1, int x2, int y2) {
         // m[y1][x1] = a, m[y2][x2] = b,   a = 0100, b = 1011
@@ -60,13 +68,22 @@ public class Utils {
         return y >= 0 && y < N && x >= 0 && x < N;
     }
 
-    
-    public static ArrayList<int[][]> copyArrayListMatrix(ArrayList<int[][]> l){
+    public static ArrayList<int[][]> copyArrayListMatrix(ArrayList<int[][]> l) {
         ArrayList<int[][]> l2 = new ArrayList<>();
         l.forEach((m) -> {
             l2.add(copyMatrix(m));
         });
         return l2;
+    }
+
+    public static String arrayToString(int[][] m) {
+        String s = "";
+        for (int[] is : m) {
+            for (int i : is) {
+                s += i;
+            }
+        }
+        return s;
     }
 
     /**
