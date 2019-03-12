@@ -20,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
@@ -49,10 +50,7 @@ public class WindowController implements Initializable {
     @FXML
     private Button btrestore;
     @FXML
-    private TextField txdigitar;
-    @FXML
     private ComboBox<String> cbalgoritmos;
-    private Label txInstrucoes;
     @FXML
     private Button btfindsolution;
     @FXML
@@ -68,7 +66,9 @@ public class WindowController implements Initializable {
     @FXML
     private Label txmsg;
     @FXML
-    private TextField txdigitar1;
+    private BorderPane borderpane;
+    @FXML
+    private TextField txDigit;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -82,12 +82,6 @@ public class WindowController implements Initializable {
         inicializaTabuleiro();
     }
 
-    private void loadInstrucoes() {
-        String txt = "Para jogar basta clicar em alguma peça ao lado da peça curinga\n"
-                + "ou  pressionar as teclas direcionais";
-        txInstrucoes.setText(txt);
-    }
-
     /**
      * habilita e desabilita componentes que não podem estar ativos durante o
      * embaralhamento
@@ -95,12 +89,14 @@ public class WindowController implements Initializable {
     private void habilitarComponents(String h) {
         bt8puzzle.setDisable(h.matches("find"));
         btrestore.setDisable(h.matches("shuffle|find"));
-        txdigitar.setDisable(h.matches("shuffle|find"));
+        txDigit.setDisable(h.matches("shuffle|find"));
         cbalgoritmos.setDisable(h.matches("shuffle|find"));
         btfindsolution.setDisable(h.matches("shuffle|find")
                 || cbalgoritmos.getSelectionModel().getSelectedIndex() <= 0);
         btnextpass.setDisable(!h.matches("solution"));
         btstopfindsolution.setDisable(!h.matches("find"));
+
+        shuffle = h.matches("shuffle");
 
         txiteracoes.setText("Iterações: ");
         txmovimentos.setText("Movimentos: ");
@@ -108,6 +104,8 @@ public class WindowController implements Initializable {
         if (!h.matches("solution|nsolution")) {
             txmsg.setText("Mensagem...");
         }
+        txDigit.setDisable(false);
+        txDigit.requestFocus();
     }
 
     /**
@@ -126,14 +124,6 @@ public class WindowController implements Initializable {
         py = px = 2;
     }
 
-    private void exibeMatrix() {
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[0].length; j++) {
-                System.out.print("[" + i + "," + j + "] = " + matrix[i][j].getText() + ", ");
-            }
-            System.out.println("");
-        }
-    }
 
     /**
      * evento para mover os buttons quando forem clicados
@@ -205,7 +195,6 @@ public class WindowController implements Initializable {
     private void clk8Puzzle(ActionEvent event) {
         if (bt8puzzle.getText().equalsIgnoreCase("embaralhar")) {
             movimentosUser = 0;
-            shuffle = true;
             habilitarComponents("shuffle");
             new Thread(() -> {
                 Platform.runLater(() -> {
@@ -218,7 +207,6 @@ public class WindowController implements Initializable {
                 });
             }).start();
         } else {
-            shuffle = false;
             habilitarComponents("all");
         }
     }
@@ -326,18 +314,21 @@ public class WindowController implements Initializable {
     private void moveKeyPress(KeyCode code) {
         if (null != code) {
             new Thread(() -> {
-                System.out.println("code = " + code.toString());
                 switch (code) {
                     case LEFT:
+                    case A:
                         idx2 = this.LEFT;
                         break;
                     case DOWN:
+                    case S:
                         idx2 = this.DOWN;
                         break;
                     case RIGHT:
+                    case D:
                         idx2 = this.RIGHT;
                         break;
                     case UP:
+                    case W:
                         idx2 = this.UP;
                         break;
                     default:
@@ -357,14 +348,6 @@ public class WindowController implements Initializable {
         }
     }
 
-    /**
-     * é necessário que o txdigitar esteja habilitado para que o evento ocorra
-     */
-    @FXML
-    private void onKeyPressedTxDigitar(KeyEvent event) {
-        moveKeyPress(event.getCode());
-    }
-
     private void inicializaTabuleiro() {
         for (int i = 0, k = 1; i < matrix.length; i++) {
             for (int j = 0; j < matrix.length; j++) {
@@ -372,8 +355,8 @@ public class WindowController implements Initializable {
                 matrix[i][j].setStyle(styleN);
             }
         }
-        px = ((int)(Math.random()*10))%3;
-        py = ((int)(Math.random()*10))%3;
+        px = ((int) (Math.random() * 10)) % 3;
+        py = ((int) (Math.random() * 10)) % 3;
         matrix[py][px].setStyle(styleK);
     }
 
@@ -498,7 +481,7 @@ public class WindowController implements Initializable {
     @FXML
     private void selectAlgoritmo(ActionEvent event) {
         btfindsolution.setDisable(cbalgoritmos.getSelectionModel().getSelectedIndex() <= 0);
-        txdigitar.requestFocus();
+        txDigit.requestFocus();
     }
 
     @FXML
@@ -507,9 +490,14 @@ public class WindowController implements Initializable {
     }
 
     @FXML
-    private void onKeyReleasedTxDigitar(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER && !btnextpass.isDisable()) {
-            clkNextPass(null);
+    private void onKeyPressed(KeyEvent event) {
+        if (!shuffle) {
+            if (event.getCode() == KeyCode.ENTER && !btnextpass.isDisable()) {
+                clkNextPass(null);
+            } else {
+                moveKeyPress(event.getCode());
+            }
+
         }
     }
 

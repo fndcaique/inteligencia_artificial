@@ -14,19 +14,6 @@ import javafx.util.Pair;
  */
 public class Utils {
 
-    public static int compareMatrix(int m1[][], int m2[][]) {
-        int r;
-        for (int i = 0; i < m1.length; ++i) {
-            for (int j = 0; j < m1[0].length; ++j) {
-                r = m1[i][j] - m2[i][j];
-                if (r != 0) {
-                    return r;
-                }
-            }
-        }
-        return 0;
-    }
-
     public static ArrayList<Pair<Integer, Integer>> copyArrayList(ArrayList<Pair<Integer, Integer>> arr) {
         ArrayList<Pair<Integer, Integer>> b = new ArrayList<>();
         arr.forEach((p) -> {
@@ -59,22 +46,11 @@ public class Utils {
         }
         return a;
     }
-
-    public static boolean inMatrix(int dimX, int dimY, int x, int y) {
-        return y >= 0 && y < dimY && x >= 0 && x < dimX;
-    }
-
+    
     public static boolean inMatrix(int N, int x, int y) {
         return y >= 0 && y < N && x >= 0 && x < N;
     }
 
-    public static ArrayList<int[][]> copyArrayListMatrix(ArrayList<int[][]> l) {
-        ArrayList<int[][]> l2 = new ArrayList<>();
-        l.forEach((m) -> {
-            l2.add(copyMatrix(m));
-        });
-        return l2;
-    }
 
     public static String arrayToString(int[][] m) {
         String s = "";
@@ -86,17 +62,5 @@ public class Utils {
         return s;
     }
 
-    /**
-     * EXCLUIR PARA GERAR O JAR
-     */
-    public static void exibeMatrix(int[][] ma) {
-        System.out.println("------------------------------------");
-        for (int[] is : ma) {
-            for (int i : is) {
-                System.out.print(i + ", ");
-            }
-            System.out.println("");
-        }
-    }
 
 }
