@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -32,14 +33,15 @@ public class WindowController implements Initializable {
 
     private ArrayList<Pair<Integer, Integer>> passos;
     private Tabuleiro tabuleiro;
-    private String styleN, styleK, tempo, movimentos, iteracoes;
+    private String styleN, styleK, tempo, movimentos, iteracoes, profundidade;
     private Button[][] matrix;
     private int movimentosUser, idxpass;
     private final int TF = 3, LEFT = 0, RIGHT = 1, DOWN = 2, UP = 3;
     private final int[] dy = {0, 0, 1, -1}, dx = {-1, 1, 0, 0};
+    private final int[][] end = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
     // vars de controle/necessidades de threads
-    private int px, py, idx, qtdeDesordenados, idx2;
+    private int px, py, idx, idx2;
     private final int SLEEP_MOVE = 100;
     private boolean shuffle;
 
@@ -69,6 +71,10 @@ public class WindowController implements Initializable {
     private BorderPane borderpane;
     @FXML
     private TextField txDigit;
+    @FXML
+    private CheckBox ckcuringarandom;
+    @FXML
+    private Label txdepth;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -124,7 +130,6 @@ public class WindowController implements Initializable {
         py = px = 2;
     }
 
-
     /**
      * evento para mover os buttons quando forem clicados
      */
@@ -154,18 +159,20 @@ public class WindowController implements Initializable {
                     py = lin;
                     px = col;
                     ++movimentosUser;
-                    isWinner();
+                    Winner();
                     break;
                 }
             }
         }
     }
 
-    private void isWinner() {
+    private boolean Winner() {
         if (isOrdered()) {
             exibeInformacao("Parabéns!!!\nDesafio concluido com " + movimentosUser + " movimentos");
             movimentosUser = 0;
+            return true;
         }
+        return false;
     }
 
     /**
@@ -200,7 +207,7 @@ public class WindowController implements Initializable {
                 Platform.runLater(() -> {
                     bt8puzzle.setText("Parar embaralhamento");
                 });
-                shuffle(10, 100, 8, 0.5);
+                shuffle(15, 100, 3, 0.5);
                 Platform.runLater(() -> {
                     bt8puzzle.setText("Embaralhar");
                     habilitarComponents("all");
@@ -247,64 +254,59 @@ public class WindowController implements Initializable {
     private void shuffle(int minmove, int maxmove, int mindesord, double probcontinuar) {
         int ant = - 1, moves = 0;
         do {
-            shuffling();
-            qtdeDesordenados = desordenados();
+            if (Math.random() >= 0.5 && inGrid(dy[RIGHT] + py, dx[RIGHT] + px)) {
+                idx = RIGHT;
+            } else if (inGrid(dy[LEFT] + py, dx[LEFT] + px)) {
+                idx = LEFT;
+            } else {
+                idx = RIGHT;
+            }
+            Platform.runLater(() -> {
+                moveSum(dy[idx], dx[idx]);
+            });
+            try {
+                Thread.sleep(SLEEP_MOVE);
+            } catch (InterruptedException ex) {
+            }
+            if (Math.random() >= 0.5 && inGrid(dy[idx] + py, dx[idx] + px)) {
+                Platform.runLater(() -> {
+                    moveSum(dy[idx], dx[idx]);
+
+                });
+                try {
+                    Thread.sleep(SLEEP_MOVE);
+                } catch (InterruptedException ex) {
+                }
+            }
+            if (Math.random() >= 0.5 && inGrid(dy[UP] + py, dx[UP] + px)) {
+                idx2 = UP;
+            } else if (inGrid(dy[DOWN] + py, dx[DOWN] + px)) {
+                idx2 = DOWN;
+            } else {
+                idx2 = UP;
+            }
+
+            Platform.runLater(() -> {
+                moveSum(dy[idx2], dx[idx2]);
+
+            });
+            try {
+                Thread.sleep(SLEEP_MOVE);
+            } catch (InterruptedException ex) {
+            }
+            if (Math.random() >= 0.5 && inGrid(dy[idx] + py, dx[idx] + px)) {
+                Platform.runLater(() -> {
+                    moveSum(dy[idx], dx[idx]);
+
+                });
+                try {
+                    Thread.sleep(SLEEP_MOVE);
+                } catch (InterruptedException ex) {
+                }
+            }
         } while (shuffle && moves < maxmove
-                && (++moves < minmove || qtdeDesordenados < mindesord
+                && (++moves < minmove || desordenados() < mindesord
                 || Math.random() <= probcontinuar));
-    }
-
-    private void shuffling() {
-        if (Math.random() >= 0.5 && inGrid(dy[RIGHT] + py, dx[RIGHT] + px)) {
-            idx = RIGHT;
-        } else if (inGrid(dy[LEFT] + py, dx[LEFT] + px)) {
-            idx = LEFT;
-        } else {
-            idx = RIGHT;
-        }
-        Platform.runLater(() -> {
-            moveSum(dy[idx], dx[idx]);
-        });
-        try {
-            Thread.sleep(SLEEP_MOVE);
-        } catch (InterruptedException ex) {
-        }
-        if (Math.random() >= 0.5 && inGrid(dy[idx] + py, dx[idx] + px)) {
-            Platform.runLater(() -> {
-                moveSum(dy[idx], dx[idx]);
-
-            });
-            try {
-                Thread.sleep(SLEEP_MOVE);
-            } catch (InterruptedException ex) {
-            }
-        }
-        if (Math.random() >= 0.5 && inGrid(dy[UP] + py, dx[UP] + px)) {
-            idx2 = UP;
-        } else if (inGrid(dy[DOWN] + py, dx[DOWN] + px)) {
-            idx2 = DOWN;
-        } else {
-            idx2 = UP;
-        }
-
-        Platform.runLater(() -> {
-            moveSum(dy[idx2], dx[idx2]);
-
-        });
-        try {
-            Thread.sleep(SLEEP_MOVE);
-        } catch (InterruptedException ex) {
-        }
-        if (Math.random() >= 0.5 && inGrid(dy[idx] + py, dx[idx] + px)) {
-            Platform.runLater(() -> {
-                moveSum(dy[idx], dx[idx]);
-
-            });
-            try {
-                Thread.sleep(SLEEP_MOVE);
-            } catch (InterruptedException ex) {
-            }
-        }
     }
 
     /**
@@ -340,7 +342,7 @@ public class WindowController implements Initializable {
                     Platform.runLater(() -> {
                         habilitarComponents("all");
                         moveSum(dy[idx2], dx[idx2]);
-                        isWinner();
+                        Winner();
                     });
                 }
 
@@ -355,6 +357,14 @@ public class WindowController implements Initializable {
                 matrix[i][j].setStyle(styleN);
             }
         }
+        if (ckcuringarandom.isSelected()) {
+            sortearPosicaoCuringa();
+        } else {
+            setPosicaoCuringa(2, 2);
+        }
+    }
+
+    private void sortearPosicaoCuringa() {
         px = ((int) (Math.random() * 10)) % 3;
         py = ((int) (Math.random() * 10)) % 3;
         matrix[py][px].setStyle(styleK);
@@ -377,12 +387,10 @@ public class WindowController implements Initializable {
 
     private void loadAlgoritmos() {
         cbalgoritmos.getItems().setAll("Selecione 1 Algoritmo",
-                "Força Bruta: DFS",
                 "Força Bruta: BFS",
-                "Heurística: Best First - Qtde Fora",
-                "Heurística: Best First - Dist. Manhattan",
                 "Heurística: A* - Qtde Fora",
-                "Heurística: A* - Dist. Manhattan");
+                "Heurística: A* - Dist. Manhattan",
+                "Heurística: A* - Dist. Manhattan + Qtde Fora");
     }
 
     @FXML
@@ -396,49 +404,43 @@ public class WindowController implements Initializable {
             });
             Platform.runLater(() -> txmsg.setText("Buscando Solução..."));
 
-            int[][] begin = new int[3][3], end = new int[3][3];
-            for (int i = 0, k = 1; i < matrix.length; i++) {
+            int[][] begin = new int[3][3];
+            for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[0].length; j++) {
                     begin[i][j] = Integer.parseInt(matrix[i][j].getText());
-                    end[i][j] = k++;
                 }
             }
             tabuleiro = new Tabuleiro(begin, end);
+            Nodo no;
             //Alert a = new Alert(Alert.AlertType.INFORMATION);
-            long ini = 0, fim = 0;
-            if (select.contains("DFS")) {
+            long ini, fim;
+            if (select.contains("BFS")) {
                 ini = System.currentTimeMillis();
-                passos = tabuleiro.solveDFS(px, py);
-                fim = System.currentTimeMillis();
-            } else if (select.contains("BFS")) {
-                ini = System.currentTimeMillis();
-                passos = tabuleiro.solveBFS(px, py);
+                no = tabuleiro.solveBFS(px, py);
                 fim = System.currentTimeMillis();
 
-            } else if (select.contains("A* - Dist. Manhattan")) {
+            } else if (select.endsWith("A* - Dist. Manhattan")) {
                 ini = System.currentTimeMillis();
-                passos = tabuleiro.solveA_DistManhattan(px, py);
+                no = tabuleiro.solveA_DistManhattan(px, py);
                 fim = System.currentTimeMillis();
 
-            } else if (select.contains("Best First - Dist. Manhattan")) {
+            } else if (select.endsWith("A* - Qtde Fora")) {
                 ini = System.currentTimeMillis();
-                passos = tabuleiro.solveBestFirst_DistManhattan(px, py);
-                fim = System.currentTimeMillis();
-            } else if (select.contains("A* - Qtde Fora")) {
-                ini = System.currentTimeMillis();
-                passos = tabuleiro.solveA_QtdeFora(px, py);
+                no = tabuleiro.solveA_QtdeFora(px, py);
                 fim = System.currentTimeMillis();
 
-            } else if (select.contains("Best First - Qtde Fora")) {
+            } else { // manhattan + qtde fora
                 ini = System.currentTimeMillis();
-                passos = tabuleiro.solveBestFirst_QtdeFora(px, py);
+                no = tabuleiro.solveA_Manhattan_QtdeFora(px, py);
                 fim = System.currentTimeMillis();
             }
             tempo = "";
             movimentos = "";
             iteracoes = "";
+            profundidade = "";
 
-            if (passos != null) {
+            if (Utils.arrayToString(no.getMatrix()).equals(Utils.arrayToString(end))) {
+                passos = no.getCaminho();
                 movimentos = (passos.size() - 1) + "";
                 Platform.runLater(() -> {
                     txmsg.setText("Solução ENCONTRADA!!!");
@@ -449,17 +451,19 @@ public class WindowController implements Initializable {
                     txmsg.setText("Solução NÃO encontrada!!!");
                     habilitarComponents("nsolution");
                 });
-                movimentos = "0";
+                movimentos = "-";
+
             }
+
+            profundidade = no.getProfundidade() + "";
             tempo = (fim - ini) + "";
             iteracoes = tabuleiro.getIteracoes() + "";
-            //a.setContentText(msg);
             movimentosUser = idxpass = 0;
-            //btnextpass.setDisable(false);
             Platform.runLater(() -> {
                 txiteracoes.setText("Iterações: " + iteracoes);
                 txmovimentos.setText("Movimentos: " + movimentos);
-                txtempo.setText("Tempo: " + tempo + " milissegundos");
+                txtempo.setText("Tempo: " + tempo + " milisegundos");
+                txdepth.setText("Profundidade: " + profundidade);
             });
         }).start();
 
@@ -473,7 +477,7 @@ public class WindowController implements Initializable {
                     matrix[py = passos.get(idxpass + 1).getValue()][px = passos.get(idxpass + 1).getKey()]);
             ++idxpass;
             if (idxpass + 1 == passos.size()) {
-                isWinner();
+                btnextpass.setDisable(Winner());
             }
         }
     }
@@ -499,6 +503,50 @@ public class WindowController implements Initializable {
             }
 
         }
+    }
+
+    @FXML
+    private void clkCase1(ActionEvent event) {
+        /*setValues("713269548");
+        setPosicaoCuringa(2, 1);*/
+        setValues("243715986");
+        setPosicaoCuringa(0, 2);
+        ckcuringarandom.setSelected(false);
+    }
+
+    @FXML
+    private void clkCase2(ActionEvent event) {
+        /*setValues("423691758");
+        setPosicaoCuringa(1, 1);
+         */
+        setValues("492156378");
+        setPosicaoCuringa(2, 0);
+        ckcuringarandom.setSelected(false);
+    }
+
+    @FXML
+    private void clkCase3(ActionEvent event) {
+        /*setValues("237548961");
+        setPosicaoCuringa(0, 2);
+         */
+        setValues("589463712");
+        setPosicaoCuringa(0, 2);
+        ckcuringarandom.setSelected(false);
+    }
+
+    private void setValues(String v) {
+        for (int i = 0, k = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                matrix[i][j].setText(v.charAt(k++) + "");
+                matrix[i][j].setStyle(styleN);
+            }
+        }
+    }
+
+    private void setPosicaoCuringa(int x, int y) {
+        px = x;
+        py = y;
+        matrix[py][px].setStyle(styleK);
     }
 
 }

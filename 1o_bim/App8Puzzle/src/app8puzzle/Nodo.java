@@ -14,7 +14,7 @@ import javafx.util.Pair;
  */
 public class Nodo implements Comparable<Nodo> {
 
-    private int fc, fa;
+    private int fc, fa, profundidade;
     private ArrayList<Pair<Integer, Integer>> caminho;
     private ArrayList<String> visits;
     private int[][] matrix;
@@ -24,7 +24,8 @@ public class Nodo implements Comparable<Nodo> {
 
     }
 
-    public Nodo(int[][] matrix, int x, int y, ArrayList<Pair<Integer, Integer>> caminho, int fc, int fa) {
+    public Nodo(int[][] matrix, int x, int y, ArrayList<Pair<Integer, Integer>> caminho, int fc, int fa, int profundidade) {
+        this.profundidade = profundidade;
         this.fc = fc;
         this.fa = fa;
         this.caminho = caminho;
@@ -46,17 +47,9 @@ public class Nodo implements Comparable<Nodo> {
         int pos = binarySearch(est);
         if (pos >= visits.size()) {
             pos -= visits.size();
-            remanejaVisits(pos);
-            visits.set(pos, est);
+            visits.add(pos, est);
         }
 
-    }
-
-    private void remanejaVisits(int pos) {
-        visits.add(null);
-        for (int i = visits.size() - 2; i >= pos; --i) {
-            visits.set(i + 1, visits.get(i));
-        }
     }
 
     public boolean isVisit(String est) {
@@ -85,7 +78,7 @@ public class Nodo implements Comparable<Nodo> {
         if (comp == 0) {
             return meio;
         }
-        if (est.compareTo(visits.get(meio)) > 0) {
+        if (comp > 0) {
             return visits.size() + meio + 1;
         }
         return visits.size() + meio;
@@ -110,6 +103,14 @@ public class Nodo implements Comparable<Nodo> {
 
     public void setMatrix(int[][] matrix) {
         this.matrix = matrix;
+    }
+
+    public int getProfundidade() {
+        return profundidade;
+    }
+
+    public void setProfundidade(int profundidade) {
+        this.profundidade = profundidade;
     }
 
     public int getX() {
