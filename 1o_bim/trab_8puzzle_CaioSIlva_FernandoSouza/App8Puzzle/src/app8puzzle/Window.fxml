@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="borderpane" prefHeight="534.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app8puzzle.WindowController">
+    <padding>
+        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+    </padding>
+   <top>
+      <GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="180.0" prefWidth="5000.0" BorderPane.alignment="CENTER">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="287.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="287.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="288.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="288.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <children>
+            <Button fx:id="btrestore" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clkRestore" prefWidth="5000.0" text="Restaurar" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                <Button fx:id="bt8puzzle" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clk8Puzzle" prefWidth="5000.0" text="Embaralhar" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+            <ComboBox fx:id="cbalgoritmos" focusTraversable="false" maxWidth="1.7976931348623157E308" onAction="#selectAlgoritmo" prefWidth="5000.0" promptText="Selecione 1 Algoritmo" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+            <Button fx:id="btfindsolution" disable="true" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clkFindSolution" prefWidth="5000.0" text="Buscar solução" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+            <Button fx:id="btnextpass" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clkNextPass" prefWidth="5000.0" text="Proximo passo" GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+            <Button fx:id="btstopfindsolution" focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clkStopFindSolution" prefWidth="5000.0" text="Parar busca pela solução" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+            <Label fx:id="txiteracoes" focusTraversable="false" text="Iterações: " GridPane.columnSpan="2" GridPane.rowIndex="4" />
+            <Label fx:id="txtempo" focusTraversable="false" text="Tempo: " GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+            <Label fx:id="txmovimentos" focusTraversable="false" text="Movimentos: " GridPane.columnSpan="2" GridPane.rowIndex="5" />
+            <Label fx:id="txmsg" focusTraversable="false" text="Mensagem..." GridPane.columnIndex="2" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+            <CheckBox fx:id="ckcuringarandom" focusTraversable="false" mnemonicParsing="false" text="Curinga Randomico" GridPane.columnSpan="2" />
+            <Button focusTraversable="false" mnemonicParsing="false" onAction="#clkCase1" text="Caso 1" GridPane.columnIndex="1" GridPane.halignment="RIGHT" />
+            <Button focusTraversable="false" mnemonicParsing="false" onAction="#clkCase2" text="Caso 2" GridPane.columnIndex="2" GridPane.halignment="RIGHT" />
+            <Button focusTraversable="false" mnemonicParsing="false" onAction="#clkCase3" text="Caso 3" GridPane.columnIndex="3" GridPane.halignment="RIGHT" />
+            <Label fx:id="txdepth" text="Profundidade:" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+         </children>
+      </GridPane>
+   </top>
+   <center>
+        <GridPane fx:id="gridPane" alignment="CENTER" gridLinesVisible="true" prefHeight="5000.0" BorderPane.alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+                <Button focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="1" textFill="WHITE">
+                    <font>
+                        <Font size="42.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="2" textFill="WHITE" GridPane.columnIndex="1">
+                    <font>
+                        <Font size="42.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="3" textFill="WHITE" GridPane.columnIndex="2">
+                    <font>
+                        <Font size="42.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="4" textFill="WHITE" GridPane.rowIndex="1">
+                    <font>
+                        <Font size="42.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="5" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <font>
+                        <Font size="42.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="6" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                    <font>
+                        <Font size="42.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="441.0" layoutY="164.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="7" textFill="WHITE" GridPane.rowIndex="2">
+                    <font>
+                        <Font size="42.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" layoutX="41.0" layoutY="30.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: #6527f9;" text="8" textFill="WHITE" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <font>
+                        <Font size="42.0" />
+                    </font>
+                </Button>
+                <Button focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" style="-fx-background-color: black;" text="9" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                    <font>
+                        <Font size="42.0" />
+                    </font>
+                </Button>
+            </children>
+        </GridPane>
+   </center>
+   <left>
+      <TextField fx:id="txDigit" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#onKeyPressed" prefHeight="10.0" prefWidth="0.0" BorderPane.alignment="CENTER" />
+   </left>
+</BorderPane>

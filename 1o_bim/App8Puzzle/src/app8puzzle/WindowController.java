@@ -107,6 +107,7 @@ public class WindowController implements Initializable {
         txiteracoes.setText("Iterações: ");
         txmovimentos.setText("Movimentos: ");
         txtempo.setText("Tempo: ");
+        txdepth.setText("Profundidade: ");
         if (!h.matches("solution|nsolution")) {
             txmsg.setText("Mensagem...");
         }
@@ -376,6 +377,8 @@ public class WindowController implements Initializable {
     @FXML
     private void clkRestore(ActionEvent event) {
         inicializaTabuleiro();
+        
+        habilitarComponents("all");
     }
 
     private void exibeInformacao(String msg) {
@@ -390,7 +393,8 @@ public class WindowController implements Initializable {
                 "Força Bruta: BFS",
                 "Heurística: A* - Qtde Fora",
                 "Heurística: A* - Dist. Manhattan",
-                "Heurística: A* - Dist. Manhattan + Qtde Fora");
+                "Heurística: A* - Dist. Manhattan + Qtde Fora",
+                "Heurística: BestFirst - Qtde Fora");
     }
 
     @FXML
@@ -429,7 +433,12 @@ public class WindowController implements Initializable {
                 no = tabuleiro.solveA_QtdeFora(px, py);
                 fim = System.currentTimeMillis();
 
-            } else { // manhattan + qtde fora
+            } else if(select.equals("Heurística: BestFirst - Qtde Fora")){
+                ini = System.currentTimeMillis();
+                no = tabuleiro.solveBestFirst_QtdeFora(px, py);
+                fim = System.currentTimeMillis();
+            }
+            else { // manhattan + qtde fora
                 ini = System.currentTimeMillis();
                 no = tabuleiro.solveA_Manhattan_QtdeFora(px, py);
                 fim = System.currentTimeMillis();
@@ -510,7 +519,7 @@ public class WindowController implements Initializable {
         /*setValues("713269548");
         setPosicaoCuringa(2, 1);*/
         setValues("243715986");
-        setPosicaoCuringa(0, 2);
+        setPosicaoCuringa(1, 2);
         ckcuringarandom.setSelected(false);
     }
 

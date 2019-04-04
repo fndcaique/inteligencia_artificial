@@ -48,7 +48,7 @@ public class Tabuleiro {
      * @param x coordenada x do curinga
      * @return list com os passos para a solução
      */
-    public Nodo solveDFS(int y, int x) {
+    public Nodo solveDFS(int x, int y) {
         String est;
         int[][] mat;
         ArrayList<Pair<Integer, Integer>> caminhoatual = new ArrayList<>(), novocam;
