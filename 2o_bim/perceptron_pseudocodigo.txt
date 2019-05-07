@@ -1,0 +1,11 @@
+tx aprendizado: 0..1
+
+inicializar pesos com 0
+
+enquanto (erro dos exemplos for 0 and Nepocas < limite){
+	erro = 0
+	Nepocas++
+	for(i = 0; i < length; ++i){
+	
+	}
+}
