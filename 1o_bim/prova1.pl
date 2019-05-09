@@ -1,14 +1,20 @@
-
 cotacao(dolar, real, 4).
 cotacao(euro, tustao, 10).
 cotacao(real, tustao, 2).
 cotacao(tupi, dolar, 2).
 
-calcula(X, Y, C) :- cot(X, Y, C, 1, [X]).
+calcula(X, Y, C) :- cot(X, Y, C, [X]).
 
-cot(X, Y, C, V, _) :- cotacao(X, Y, R), C is V * R, !.
-cot(X, Y, C, V, _) :- cotacao(Y, X, R), C is V / R, !.
-cot(X, Y, C, V, Cam) :- cotacao(Z, X, R), not(member(Z, Cam)),
-  cot(Z, Y, C, V/R, [Z|Cam]).
-cot(X, Y, C, V, Cam) :- cotacao(X, Z, R), not(member(Z, Cam)),
-  cot(Z, Y, C, V * R, [Z|Cam]).
+cambio(X, Y, Z) :- cotacao(X, Y, Z).
+cambio(X, Y, Z) :- cotacao(Y, X, R), Z is 1/R.
+
+cot(X, Y, C, _) :- cambio(X, Y, C).
+cot(X, Y, C, _) :- cambio(Y, X, C).
+cot(X, Y, C, Cam) :- cambio(X, Z, R), not(member(Z, Cam)),
+  cot(Z, Y, V, [Z|Cam]), C is V * R.
+
+
+ remove(L,L1, R) :- retira(L, L1, R, 1).
+ retira([],[],[],_).
+ retira([H|T],[C|K], R, P) :- P = C, !, retira(T, K, R2, P+1), R = [H,R2];
+ 	retira(T, [C|K], R, P+1).
