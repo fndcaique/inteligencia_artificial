@@ -7,80 +7,73 @@ package fnd;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Set;
-
 /**
  *
  * @author fnd
  */
 public class DataMLP {
 
-    private HashMap<String, Boolean> mapclasses;
-    private HashMap<Integer, String> classedados;
     private FndFile file;
     private ArrayList<double[]> dados;
+    private ArrayList<String> classes;
     private String sep;
     private boolean header;
-    private String[] arrheader, arrclass;
+    private String[] arrheader;
     private double[][] tabledata;
-    private int colsdata, rows;
 
     public DataMLP(String path, String sep, boolean header) throws FileNotFoundException {
         this.file = new FndFile(path);
         this.header = header;
         this.sep = sep;
-        mapclasses = new HashMap<>();
-        classedados = new HashMap<>();
         readData();
     }
 
     private void readData() {
         file.open("r");
         dados = new ArrayList<>();
+        classes = new ArrayList<>();
         String line, arr[];
         if (header && (line = file.readLine()) != null) {
             arrheader = line.split(sep);
         }
-        int idx = 0, cols = 0;
+        int idx;
         while ((line = file.readLine()) != null) {
             arr = line.split(sep);
-            double[] dl = new double[cols = arr.length - 1];
-            mapclasses.put(arr[cols], true);
-            for (int i = 0; i < cols; i++) {
+            double[] dl = new double[arr.length];
+            idx = classes.indexOf(arr[arr.length-1]);
+            if(idx == -1){
+                classes.add(arr[arr.length-1]);
+                idx = classes.size()-1;
+            }
+            for (int i = 0; i < arr.length-1; i++) {
                 String str = arr[i];
                 dl[i] = Double.parseDouble(str);
             }
+            dl[arr.length-1] = idx;
             dados.add(dl);
-            classedados.put(idx, arr[cols]);
-            ++idx;
         }
-        colsdata = cols;
         file.close();
     }
 
     public int getColsdata() {
-        return colsdata;
+        return dados.get(0).length;
     }
 
     public int getRows() {
-        return rows;
+        return dados.size();
     }
     
     public int getQtdeClass(){
-        return mapclasses.size();
+        return classes.size();
     }
     
-    public String[] getClasses(){
-        if(arrclass == null){
-            mapclasses.keySet().toArray(arrclass = new String[mapclasses.size()]);
-        }
-        return arrclass;
+    public ArrayList<String> getClasses(){
+        
+        return classes;
     }
 
     public String getClassOfData(int idxlinedata) {
-        return classedados.get(idxlinedata);
+        return classes.get((int)dados.get(idxlinedata)[dados.get(idxlinedata).length-1]);
     }
 
     public double[] getLine(int idx) {
@@ -89,7 +82,7 @@ public class DataMLP {
 
     public double[][] getTableData() {
         if (tabledata == null) {
-            tabledata = new double[dados.size()][colsdata];
+            tabledata = new double[dados.size()][dados.get(0).length];
             tabledata = dados.toArray(tabledata);
         }
         return tabledata;
