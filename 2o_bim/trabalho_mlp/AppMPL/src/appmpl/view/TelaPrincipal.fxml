@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXCheckBox?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="616.0" prefWidth="791.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="appmpl.view.TelaPrincipalController">
+   <top>
+      <HBox alignment="CENTER" prefHeight="34.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="MLP">
+               <font>
+                  <Font size="34.0" />
+               </font>
+            </Label>
+         </children></HBox>
+   </top>
+   <center>
+      <ScrollPane fitToHeight="true" fitToWidth="true" BorderPane.alignment="CENTER">
+         <content>
+            <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+               <children>
+                  <GridPane hgap="5.0" minHeight="170.0" vgap="10.0">
+                     <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <Label text="Neurônios:" GridPane.halignment="RIGHT" GridPane.valignment="CENTER" />
+                        <JFXTextField fx:id="txcamentrada" editable="false" labelFloat="true" maxWidth="94.0" prefHeight="26.0" prefWidth="94.0" promptText="Cam. Entrada" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                        <JFXTextField fx:id="txcamsaida" editable="false" labelFloat="true" maxWidth="79.0" prefHeight="26.0" prefWidth="79.0" promptText="Cam. Saída" GridPane.columnIndex="3" GridPane.halignment="CENTER" />
+                        <JFXTextField fx:id="txcamoculta" labelFloat="true" maxWidth="85.0" prefHeight="26.0" prefWidth="85.0" promptText="Cam. Oculta" GridPane.columnIndex="2" GridPane.halignment="CENTER" />
+                        <JFXComboBox fx:id="cbfuncao" labelFloat="true" onAction="#selectFuncaoTransferencia" prefHeight="26.0" prefWidth="240.0" promptText="Função de Transferência" GridPane.rowIndex="1" />
+                        <JFXTextField fx:id="txerro" labelFloat="true" maxWidth="70.0" promptText="Erro" text="0,000001" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                        <JFXTextField fx:id="txmaxepocas" labelFloat="true" maxWidth="88.0" prefHeight="26.0" prefWidth="88.0" promptText="Máx. Épocas" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                        <JFXTextField fx:id="txtaxaaprendizado" labelFloat="true" maxWidth="140.0" prefHeight="26.0" prefWidth="140.0" promptText="Taxa de Aprendizado" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                        <JFXButton buttonType="RAISED" onAction="#clkAbrirArquivo" style="-fx-background-color: gray;" text="Abrir arquivo" textFill="WHITE" GridPane.rowIndex="2">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </JFXButton>
+                        <Label fx:id="lbfilename" text="nomedoarquivo.csv" GridPane.columnIndex="3" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
+                        <JFXButton fx:id="bttreinar" buttonType="RAISED" onAction="#clkTreinar" style="-fx-background-color: gray;" text="Realizar Treino" textFill="WHITE" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXButton fx:id="btteste" buttonType="RAISED" onAction="#clkTestar" style="-fx-background-color: gray;" text="Realizar Teste" textFill="WHITE" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXCheckBox fx:id="ckcabecalho" checkedColor="#5a5a5a" text="Tem cabeçalho" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                        <JFXTextField fx:id="txseparador" labelFloat="true" maxWidth="60.0" prefHeight="26.0" prefWidth="138.0" promptText="Separador" text="," GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                     </children>
+                  </GridPane>
+                  <TableView fx:id="tbvdados" prefHeight="200.0" prefWidth="200.0">
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </TableView>
+                  <BorderPane fx:id="bpgrafico" prefHeight="200.0" prefWidth="200.0" />
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</BorderPane>

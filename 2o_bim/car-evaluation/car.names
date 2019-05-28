@@ -63,12 +63,12 @@
 
 7. Attribute Values:
 
-   buying       v-high, high, med, low
-   maint        v-high, high, med, low
-   doors        2, 3, 4, 5-more
-   persons      2, 4, more
-   lug_boot     small, med, big
-   safety       low, med, high
+   buying       vhigh[4], high[3], med[2], low[1]
+   maint        vhigh, high, med, low
+   doors        2, 3, 4, 5more[5]
+   persons      2, 4, more[5]
+   lug_boot     small[1], med[2], big[3]
+   safety       low[1], med[2], high[3]
 
 8. Missing Attribute Values: none
 
